@@ -1,0 +1,578 @@
+src/build/main/java/gls:
+allusers.java:
+package gls;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+/**
+ * Servlet implementation class allusers
+ */
+public class allusers extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public allusers() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+    	PrintWriter out= response.getWriter();
+
+		try
+		{
+   Class.forName("com.mysql.cj.jdbc.Driver");
+   //Connection con= DriverManager.getConnection("jdbc:mysql://128.66.203.247:3306/exam1","exam1","sumo@123");
+   
+   Connection con= DriverManager.getConnection("jdbc:mysql://localhost/user","root","sharvil123");
+   PreparedStatement pst=  con.prepareStatement("Select * from user1");
+   ResultSet rs=  pst.executeQuery();
+   while(rs.next())
+   		{
+	   String id=rs.getString(1);
+	   String uname=rs.getString(2);
+	   String password=rs.getString(3);
+	   String linkUrl = "details?uname=" + uname + "&password=" + password+ "&uid=" + id;
+       out.println("<html>");
+       out.println("<body>");
+       out.println("<a href='" + linkUrl + "'>" + "username= "+"<b>" +uname +"</b>" + " " + "password=" +"<b>"+ password+"</b>"+"<br>" + "</a>");
+       out.println("</body>");
+       out.println("</html>");
+      }
+   out.close();
+		}//try end
+    	catch(Exception e)
+    	{
+    		System.out.println(e);
+    	}
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}
+
+delete.java:
+package gls;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+
+/**
+ * Servlet implementation class delete
+ */
+public class delete extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public delete() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		response.setContentType("text/html");
+		PrintWriter out= response.getWriter();		
+		String uid= request.getParameter("uid");
+		out.println("Delete operation for user ID:"+uid);
+		try 
+		{
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection con= DriverManager.getConnection("jdbc:mysql://localhost/user","root","sharvil123");
+			  PreparedStatement pst=  con.prepareStatement("delete from user1 where uid=" +uid);
+			  pst.executeUpdate();
+			  out.println("user Deleted");
+			  String linkUrl="allusers";                
+		        out.println("<b>"+"<a href='" + linkUrl + "'>" + "login" + "</a>"+"</b>");
+			  
+		}
+		catch(Exception e)
+    	{
+    		System.out.println(e);
+    	}
+		
+	}
+	
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}
+
+details.java:
+package gls;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+/**
+ * Servlet implementation class details
+ */
+public class details extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public details() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		PrintWriter out = response.getWriter();
+		String uid = request.getParameter("uid");
+		String uname = request.getParameter("uname");
+        String password = request.getParameter("password");
+        
+        // Display the received variables
+        out.println("<html>");
+        out.println("<body> <center>");
+        out.println("<h1>User Name: " + uname + "</h1>");
+        out.println("<h1> password: " + password + "</h1>");
+        
+        
+        String delUrl="delete?uid="+ uid;
+        out.println("<b>"+"<a href='" + delUrl + "'>" + "delete" + "</a>"+"</b>");
+        
+        String editUrl="edit?uid=" + uid + "&uname="+uname + "&password=" +password;
+        out.println("<b>"+"<a href='" + editUrl + "'>" + "forgotpassword" + "</a>"+"</b>");
+        
+        String linkUrl="login.jsp";                
+        out.println("<b>"+"<a href='" + linkUrl + "'>" + "login" + "</a>"+"</b>");
+        
+        out.println("</center></body>");
+        out.println("</html>");
+        
+        out.close();	
+        }
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}
+
+
+edit.java:
+package gls;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+/**
+ * Servlet implementation class edit
+ */
+public class edit extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public edit() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		response.setContentType("text/html");
+		PrintWriter out= response.getWriter();
+		out.println("Edit user");
+		String uid = request.getParameter("uid");
+		String uname = request.getParameter("uname");
+        String password = request.getParameter("password");
+        out.println(uname);
+        out.println("<form action='editaction' method='POST'>");
+        out.print("<table>");  
+        out.print("<tr><td></td><td><input type='hidden' name='uid' value='"+uid+"'/></td></tr>");  
+        out.print("<tr><td>user Name:</td><td><input type='text' name='uname' value='"+uname+"'/></td></tr>");  
+        out.print("<tr><td>pasword:</td><td><input type='text' name='password' value='"+password+"'/></td></tr>"); 
+        out.println("<tr><td></td><td><input type='submit'value='edit user'></td>");
+        out.println("</table></form>");
+        
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}
+
+
+editaction.java:
+package gls;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+
+/**
+ * Servlet implementation class editaction
+ */
+public class editaction extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public editaction() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		 response.setContentType("text/html");
+		    PrintWriter out = response.getWriter();
+		    String uid = request.getParameter("uid");
+		    String uname = request.getParameter("uname"); 
+		    String password = request.getParameter("password");
+		    try {
+		        Class.forName("com.mysql.cj.jdbc.Driver");
+		        String updateSQL = "UPDATE user1 SET uname=?, password=? WHERE uid=?";
+		        Connection con = DriverManager.getConnection("jdbc:mysql://localhost/user", "root", "sharvil123");
+		        PreparedStatement pst = con.prepareStatement(updateSQL);
+		        pst.setString(1, uname);
+		        pst.setString(2, password);
+		        pst.setString(3, uid);
+		        pst.executeUpdate();
+		        out.println("User Updated");
+		        out.println("<a href=\"allusers\">Show users</a>");
+		        System.out.print("User Updated");
+		    } catch (Exception e) {
+		        System.out.print(e);
+		    }
+		    doGet(request, response);
+		}
+	}
+
+
+insert.java:
+package gls;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+
+/**
+ * Servlet implementation class insert
+ */
+public class insert extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public insert() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		response.setContentType("text/html");
+		PrintWriter out=response.getWriter();
+		String uname= request.getParameter("uname"); 
+		String password= request.getParameter("password");
+		String email= request.getParameter("email");
+		String contact= request.getParameter("contact");
+		
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			String insertSQL="insert into user1 (uname,password,email,contact) values (?,?,?,?)";
+			Connection con=DriverManager.getConnection("jdbc:mysql://localhost/user","root","sharvil123");
+			PreparedStatement pst=con.prepareStatement(insertSQL);
+		
+			pst.setString(1,uname);
+			pst.setString(2, password);
+			pst.setString(3, email);
+			pst.setString(4, contact);
+			pst.executeUpdate();
+			
+			out.println("added user in database");
+			out.println("<a href =\"validate\">Show user</a>");
+			System.out.print("user Added");
+
+
+			
+		}catch(Exception e) {
+			System.out.println(e);
+		}
+		
+		doGet(request, response);
+	}
+
+}
+
+
+
+validate.java:
+package gls;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+/**
+ * Servlet implementation class validate
+ */
+public class validate extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public validate() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+
+		String uname = request.getParameter("uname");
+		String password= request.getParameter("password");
+		
+		   PrintWriter out=response.getWriter();
+			try
+			{
+	   Class.forName("com.mysql.cj.jdbc.Driver");
+	   //Connection con= DriverManager.getConnection("jdbc:mysql://128.66.203.247:3306/exam1","exam1","sumo@123");
+	   Connection con= DriverManager.getConnection("jdbc:mysql://localhost/user","root","sharvil123");
+	   PreparedStatement pst=  con.prepareStatement("Select * from user1 WHERE uname=? AND password=?");
+	   PreparedStatement pst1=  con.prepareStatement("Select * from user1 ");
+
+	   pst.setString(1,uname);
+	   pst.setString(2,password);
+	   ResultSet rs=  pst.executeQuery();
+	   ResultSet rs1=  pst1.executeQuery();
+
+	   if (rs.next()) {	   		{
+		   String id1=rs.getString(1);
+		   String uname1=rs.getString(2);
+		   String pass=rs.getString(3);
+	   		String linkUrl = "details?uname=" + uname1 + "&password=" + pass+ "&uid=" + id1;
+	   		out.println("<html>");
+	   		out.println("<body>");
+	   		out.println("<a href='" + linkUrl + "'>" + uname +password + "</a>");
+	      	out.println("</body>");
+	      	out.println("</html>");
+	      	}
+	   }
+	   else 
+		   
+		   response.sendRedirect("error.jsp");  
+			
+			 
+		  out.close();
+			}catch(Exception e)
+			{
+				System.out.println(e);
+			
+			}
+		}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}
+
+
+
+
+
+
+Webapp/Web-INF:
+error.jsp:
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	error in login
+</body>
+</html>
+
+index.jsp:
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<a href="login.jsp">log in</a><br>
+	<a href="signup.jsp">sign up</a>
+</body>
+</html>
+
+login.jsp:
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<h1> Login Page</h1>
+
+<form action="validate" method="post">
+<p> UserName <input type="text" name="uname"></p>
+<p> Password <input type="password" name="password"></p>
+<p>  <input type="submit" value="Login"></p>
+</form>
+</body>
+</html>
+
+
+signup.jsp:
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<form action="insert" method="post">
+<p> UserName <input type="text" name="uname"></p>
+<p> Password <input type="password" name="password"></p>
+<p> email <input type="email" name="email"></p>
+<p> contact <input type="number" name="contact"></p>
+
+<p>  <input type="submit" value="sign up"></p>
+</form>
+</body>
+</html>
+
+
+success.jsp:
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	successfully login
+</body>
+</html>
